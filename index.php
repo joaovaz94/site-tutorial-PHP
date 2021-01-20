@@ -8,8 +8,10 @@ require_once 'lib/Database/Connection.php';
 require_once 'app/Controller/HomeController.php';
 require_once 'app/Controller/ErrorController.php';
 require_once 'app/Controller/PostController.php';
+require_once 'app/Controller/SobreController.php';
 
 require_once 'app/Model/Postagem.php';
+require_once 'app/Model/Comentario.php';
 
 //requisição para carregar componentes do Composer
 require_once 'vendor/autoload.php';
