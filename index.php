@@ -10,6 +10,9 @@ require_once 'app/Controller/ErrorController.php';
 
 require_once 'app/Model/Postagem.php';
 
+//requisição para carregar componentes do Composer
+require_once 'vendor/autoload.php';
+
 $template = file_get_contents('app/Template/estrutura.html');
 
 ob_start();

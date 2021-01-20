@@ -4,12 +4,23 @@
 	public function index() {
 	    
 	    try {
-		//echo 'Home';
 		$colecPostagens = Postagem::selecionaTodos();
 
-		var_dump($colecPostagens);
+		//renderizando a vizualisação de página a partir do Twig
+		$loader = new \Twig\Loader\FilesystemLoader('app/View');
+		$twig = new \Twig\Environment($loader);
+		$template = $twig->load('home.html');
+
+		$parametros = array(); 
+		$parametros['postagens'] = $colecPostagens;
+
+		$conteudo = $template->render($parametros);
+		echo $conteudo;
+		    
+
 	    } catch(Exception $e) {
 		echo $e->getMessage();
 	    }
 	}
     }
+?>
