@@ -8,8 +8,8 @@
 
 	public static function getConn() {
 	    if (self::$conn === null){
-		self::$conn = new PDO('mysql: host=localhost; dbname=serie-criando-site;', 'root', '8565');
+		self::$conn = new PDO('mysql:host=localhost;dbname=serie-criando-site', 'root', '8565');
 	    }
-	    return self::conn;
+	    return self::$conn;
 	}
     }
