@@ -3,7 +3,12 @@
     class Core {
 	public function start($urlGet){
 
-	    $acao = 'index';
+	    //condição para saber se há requisição de metodo para lê-lo, caso contrario chamar metodo index
+	    if (isset($urlGet['metodo'])) {
+		$acao = $urlGet['metodo'];
+	    } else {
+		$acao = 'index';
+	    } 
 
 	    if (isset($urlGet['pagina'])) {
 		$controller = ucfirst($urlGet['pagina'].'Controller');
