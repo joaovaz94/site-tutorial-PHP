@@ -64,4 +64,45 @@
 	    return true;
 	}
 
+
+	public static function update($params) {
+	    if(empty($params['titulo']) || empty($params['conteudo'])) {
+		throw new Exception("Os campos da postagem não podem estar vazios");
+
+		return false;
+	    }
+	    
+	    $con = Connection::getConn();
+
+	    $sql = $con->prepare('UPDATE postagem SET titulo = :tit, conteudo = :cont WHERE id = :id');
+	    $sql->bindValue(':tit', $params['titulo']);
+	    $sql->bindValue(':cont', $params['conteudo']);
+	    $sql->bindValue(':id', $params['id']);
+	    $res = $sql->execute();
+
+	    if($res == 0) {
+		throw new Exception("Falha ao alterar postagem");
+		return false; 
+	    }
+
+	    return true;
+	}
+
+	public static function delete($id) {
+
+	    $con = Connection::getConn();
+
+	    $sql = $con->prepare('DELETE FROM postagem WHERE id = :id');
+	    $sql->bindValue(':id', $id);
+	    $res = $sql->execute();
+
+	    if($res == 0) {
+		throw new Exception("Falha ao deletar postagem");
+		return false; 
+	    }
+
+	    return true;
+	    
+	}
+
     }

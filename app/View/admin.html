@@ -14,8 +14,8 @@
     <tr>
 	<th>{{postagem.id}}</th>
 	<th>{{postagem.titulo}}</th>
-	<th>ALTERAR</th>
-	<th>DELETAR</th>
+	<th><a href="http://localhost/tutorial-site/?pagina=admin&metodo=change&id={{postagem.id}}">EDITAR</a></th>
+	<th><a href="http://localhost/tutorial-site/?pagina=admin&metodo=delete&id={{postagem.id}}">DELETAR</a></th>
     </tr>
     {% endfor %}
 
