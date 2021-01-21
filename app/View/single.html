@@ -9,6 +9,20 @@
 	    <br>
 	    <hr>
 	    <br>
+	    
+	    <form method="post" action="http://localhost/tutorial-site/?pagina=post&methodo=addComent">
+		<span>Nome:</span><br>
+		<input type="text" name="nome"><br><br>
+
+		<span> Comentário:</span><br>
+		<textarea name="msg"></textarea><br><br>
+		
+		<input type="hidden" name="id" value="{{id}}">
+
+		<input type="submit"  value="Enviar">
+	    </form>
+	    <br><br>
+
 	    {% if comentarios == false %}
 		<p>Seja o primeiro a comentar!</p>
 	    {% else %}

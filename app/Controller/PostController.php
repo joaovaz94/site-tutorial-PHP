@@ -13,6 +13,7 @@
 		$template = $twig->load('single.html');
 
 		$parametros = array(); 
+		$parametros['id'] = $postagem->id;
 		$parametros['titulo'] = $postagem->titulo;
 		$parametros['conteudo'] = $postagem->conteudo;
 		$parametros['comentarios'] = $postagem->comentarios;
@@ -25,5 +26,17 @@
 		echo $e->getMessage();
 	    }
 	}
+
+	public function addComent() {
+
+	    try {
+		Comentario::inserir($_POST);
+
+		header('Location: http://localhost/tutorial-site/?pagina=post&id='.$_POST['id']);
+	    } catch(Exception $e) {
+		echo '<script>alert("'.$e->getMessage().'");</script>';
+		echo '<script>location.href = "http://localhost/tutorial-site/?pagina=post&id='.$_POST['id'].'"</script>';
+	    }
+	} 
     }
 ?>
