@@ -42,4 +42,26 @@
 	    return $resultado;
 	} 
 
+	public static function insert($dadosPost) {
+	    if(empty($dadosPost['titulo']) || empty($dadosPost['conteudo'])) {
+		throw new Exception("Os campos da postagem não podem estar vazios");
+
+		return false;
+	    }
+	    
+	    $con = Connection::getConn();
+
+	    $sql = $con->prepare('INSERT INTO postagem (titulo, conteudo) VALUES (:tit, :cont )');
+	    $sql->bindValue(':tit', $dadosPost['titulo']);
+	    $sql->bindValue(':cont', $dadosPost['conteudo']);
+	    $res = $sql->execute();
+
+	    if($res == 0) {
+		throw new Exception("Falha ao inserir postagem");
+		return false; 
+	    }
+
+	    return true;
+	}
+
     }
