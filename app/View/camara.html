@@ -4,6 +4,7 @@
     <script>
         "use strict";
         var listaDeps = new Array();
+        var listaParts = new Array();
 
         /* buscarListaDeps
             Carrega 'listaDeps' com os dados obtidos do recurso paginado,
@@ -54,8 +55,57 @@
         }
 
         buscarListaDeps("https://dadosabertos.camara.leg.br/api/v2/deputados?itens=100");
+        //buscarListaDeps("https://dadosabertos.camara.leg.br/api/v2/proposicoes");
 
+        /* buscarListaParts
+            Carrega 'listaParts' com os dados obtidos do recurso paginado,
+            em chamadas sucessivas
+        */
+        function buscarListaParts (urlInicio) {
+            var corpoResposta;
+            var req = new XMLHttpRequest();
+            var dados;
 
+            req.open ("GET", urlInicio);
+            req.onreadystatechange = function (evt) {
+               if (req.readyState === req.DONE &&
+                    req.status >= 200 && req.status < 300) {
+                    // A requisição foi respondida com sucesso.
+                    corpoResposta = JSON.parse(req.responseText);
+
+                    listaParts = listaParts.concat(corpoResposta.dados);
+
+                    // Se houver um link de rel="next" na resposta, chamar a função de busca
+                    // outra vez usando esse link
+                    // VERSÃO COM LOOP FOR
+                    for (var i = 0; i < corpoResposta.links.length; i++) {
+
+                        if (corpoResposta.links[i].rel === "next") {
+                            buscarListaParts(corpoResposta.links[i].href);
+                            return;
+                        }
+                    }
+
+                    /* VERSÃO USANDO FOREACH
+                    corpoResposta.links.forEach (
+                        function (val, idx, arr) {
+                            if (val.rel === "next") {
+                                buscarListaParts (val.href);
+                                return;
+                            }
+                        }
+                    );
+                    */
+
+                    menuCarregarOpcoes();
+
+                } // FIM DO "IF"
+            } // FIM DE onreadystatechange
+            req.setRequestHeader ("Accept", "application/json");
+            req.send();
+        }
+
+        buscarListaParts("https://dadosabertos.camara.leg.br/api/v2/partidos");
 
         /* menuCarregarOpcoes
              Configura as opções de nomes de deputados no menu
@@ -79,6 +129,29 @@
             }
         }
 
+	/* menuCarregarOpcoesPartido
+             Configura as opções de sigleas partidarias no menu
+         */
+        function menuCarregarOpcoesPartido() {
+            var i=0;
+            var menuwdg = document.getElementById("menuparts");
+            var opt;
+
+            // Criar o primeiro item sem a sigla de um partido..
+            opt = document.createElement("option");
+            opt.text = "Escolha um partido..."
+            menuwdg.add(opt);
+
+            while (listaParts[i]) {
+
+                opt = document.createElement("option");
+                opt.text = listaParts[i].nome;
+                menuwdg.add(opt);
+                i++;
+            }
+        }
+
+
         /* menuOpcaoEscolhida
             Chamada quando o usuário escolhe outro nome no menu, executa
             as alterações na foto e no quadro de informações.
@@ -91,6 +164,22 @@
             for (var i = 0; i < listaDeps.length; i++) {
                 if (listaDeps[i].nome === escolhido) {
                      mostrarDeputado (listaDeps[i]);
+                }
+            }
+        }
+
+        /* menuOpcaoEscolhidaPartido
+            Chamada quando o usuário escolhe outro nome no menu, executa
+            as alterações na foto e no quadro de informações.
+        */
+        function menuOpcaoEscolhidaPartido() {
+            var escolhido;
+            var menuwdg = document.getElementById("menuparts");
+
+            escolhido = menuwdg.value;
+            for (var i = 0; i < listaParts.length; i++) {
+                if (listaDeps[i].nome === escolhido) {
+                     mostrarDeputado (listaParts[i]);
                 }
             }
         }
@@ -115,7 +204,6 @@
         }
     </script>
 </head>
-
 <body>
     <!-- Aqui é criado o controle de menu -->
     <select id="menudeps" onchange="menuOpcaoEscolhida()"></select><br/>
@@ -128,4 +216,8 @@
     <!-- Nome e estado -->
     <h3 id="nomedep"></h3>
     <h4 id="part-est"></h4>
+
+    <h2>Seleção de partidos para mostrar os membros</h2>
+    <select id="menuparts" onchange="menuOpcaoEscolhidaPartido()"></select><br/>
+
 </body>
