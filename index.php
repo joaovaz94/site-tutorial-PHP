@@ -10,6 +10,7 @@ require_once 'app/Controller/ErrorController.php';
 require_once 'app/Controller/PostController.php';
 require_once 'app/Controller/SobreController.php';
 require_once 'app/Controller/AdminController.php';
+require_once 'app/Controller/CamaraController.php';
 
 require_once 'app/Model/Postagem.php';
 require_once 'app/Model/Comentario.php';

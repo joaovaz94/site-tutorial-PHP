@@ -1,0 +1,131 @@
+<head>
+<h1>Câmara dos Deputados</h1>
+
+    <script>
+        "use strict";
+        var listaDeps = new Array();
+
+        /* buscarListaDeps
+            Carrega 'listaDeps' com os dados obtidos do recurso paginado,
+            em chamadas sucessivas
+        */
+        function buscarListaDeps (urlInicio) {
+            var corpoResposta;
+            var req = new XMLHttpRequest();
+            var dados;
+
+            req.open ("GET", urlInicio);
+            req.onreadystatechange = function (evt) {
+               if (req.readyState === req.DONE &&
+                    req.status >= 200 && req.status < 300) {
+                    // A requisição foi respondida com sucesso.
+                    corpoResposta = JSON.parse(req.responseText);
+
+                    listaDeps = listaDeps.concat(corpoResposta.dados);
+
+                    // Se houver um link de rel="next" na resposta, chamar a função de busca
+                    // outra vez usando esse link
+                    // VERSÃO COM LOOP FOR
+                    for (var i = 0; i < corpoResposta.links.length; i++) {
+
+                        if (corpoResposta.links[i].rel === "next") {
+                            buscarListaDeps(corpoResposta.links[i].href);
+                            return;
+                        }
+                    }
+
+                    /* VERSÃO USANDO FOREACH
+                    corpoResposta.links.forEach (
+                        function (val, idx, arr) {
+                            if (val.rel === "next") {
+                                buscarListaDeps (val.href);
+                                return;
+                            }
+                        }
+                    );
+                    */
+
+                    menuCarregarOpcoes();
+
+                } // FIM DO "IF"
+            } // FIM DE onreadystatechange
+            req.setRequestHeader ("Accept", "application/json");
+            req.send();
+        }
+
+        buscarListaDeps("https://dadosabertos.camara.leg.br/api/v2/deputados?itens=100");
+
+
+
+        /* menuCarregarOpcoes
+             Configura as opções de nomes de deputados no menu
+         */
+        function menuCarregarOpcoes() {
+            var i=0;
+            var menuwdg = document.getElementById("menudeps");
+            var opt;
+
+            // Criar o primeiro item sem o nome de um parlamentar...
+            opt = document.createElement("option");
+            opt.text = "Escolha um parlamentar..."
+            menuwdg.add(opt);
+
+            while (listaDeps[i]) {
+
+                opt = document.createElement("option");
+                opt.text = listaDeps[i].nome;
+                menuwdg.add(opt);
+                i++;
+            }
+        }
+
+        /* menuOpcaoEscolhida
+            Chamada quando o usuário escolhe outro nome no menu, executa
+            as alterações na foto e no quadro de informações.
+        */
+        function menuOpcaoEscolhida() {
+            var escolhido;
+            var menuwdg = document.getElementById("menudeps");
+
+            escolhido = menuwdg.value;
+            for (var i = 0; i < listaDeps.length; i++) {
+                if (listaDeps[i].nome === escolhido) {
+                     mostrarDeputado (listaDeps[i]);
+                }
+            }
+        }
+
+        /*
+        mostrarDeputado - recebe um item da lista de deputados,
+          contendo os dados de um parlamentar, e os insere na
+          exibição do HTML no navegador
+        */
+        function mostrarDeputado (dep) {
+            var wdgFoto = document.getElementById("fotodep");
+            var wdgNome = document.getElementById("nomedep");
+            var wdgPartEst = document.getElementById("part-est");
+
+            // A URL da foto é colocada como valor do atributo "src"
+            //    do elemento <img> identificado com o id "fotodep"
+            wdgFoto.setAttribute("src", dep.urlFoto);
+
+            // O nome é inserido como conteúdo do elemento com id "nome"
+            wdgNome.innerHTML = dep.nome;
+            wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Aqui é criado o controle de menu -->
+    <select id="menudeps" onchange="menuOpcaoEscolhida()"></select><br/>
+
+    <!-- A foto é exibida neste elemento "img"... -->
+    <br/>
+    <img id="fotodep" src="../../img/howtouse/avatar-anonimo.png" width="200"/>
+    <br/>
+
+    <!-- Nome e estado -->
+    <h3 id="nomedep"></h3>
+    <h4 id="part-est"></h4>
+</body>
