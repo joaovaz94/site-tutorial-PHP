@@ -97,7 +97,7 @@
                     );
                     */
 
-                    menuCarregarOpcoes();
+                    menuCarregarOpcoesPartido();
 
                 } // FIM DO "IF"
             } // FIM DE onreadystatechange
@@ -178,8 +178,9 @@
 
             escolhido = menuwdg.value;
             for (var i = 0; i < listaParts.length; i++) {
-                if (listaDeps[i].nome === escolhido) {
-                     mostrarDeputado (listaParts[i]);
+                if (listaParts[i].nome === escolhido) {
+                     mostrarPartido (listaParts[i]);
+		     //deputadosPorPartido(listaParts[i].id);
                 }
             }
         }
@@ -202,6 +203,71 @@
             wdgNome.innerHTML = dep.nome;
             wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
         }
+
+        /*
+        mostrarPartido - recebe um item da lista de deputados,
+          contendo os dados de um parlamentar, e os insere na
+          exibição do HTML no navegador
+        */
+        function mostrarPartido (part) {
+            //var wdgFoto = document.getElementById("fotodep");
+            var wdgNome = document.getElementById("nomepart");
+            //var wdgPartEst = document.getElementById("part-est");
+
+            // A URL da foto é colocada como valor do atributo "src"
+            //    do elemento <img> identificado com o id "fotodep"
+            //wdgFoto.setAttribute("src", dep.urlFoto);
+
+            // O nome é inserido como conteúdo do elemento com id "nome"
+            wdgNome.innerHTML = part.sigla;
+            //wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
+        }
+
+	/* 
+	    Código para retornar Parlamentares de partido escolhido
+	*/
+
+	function montaUrl(idPart) {
+	    var idPart = idPart;
+	    var prefix = "https://dadosabertos.camara.leg.br/api/v2/partidosi/";
+	    var comp = "/membros";
+
+	    var url = prefix.concat(idPart,comp);
+
+	    return url;
+	}
+
+	function fazGet(url) {
+		    var request = new XMLHttpRequest()
+		    request.open("GET", url, false)
+		    request.send()
+		    return request.responseText
+	}
+
+	function criaLinha(dep) {
+		    linha = document.createElement("tr");
+		    tdNome = document.createElement("td");
+		    tdUf = document.createElement("td");
+		    tdUf.innerHTML = dep.siglaUf;
+		    tdNome.innerHTML = dep.nome;
+
+		    linha.appendChild(tdNome);
+		    linha.appendChild(tdUf);
+
+		    return linha;
+	}
+
+	function deputadosPorPartido(idPart) {
+	    var url = montaUrl(idPart);
+	    var dados = fazGet(url);
+	    var deputados = JSON.parse(dados);
+	    var tabela = document.getElementById("tabela");
+	    deputados.forEach(element => {
+			var linha = criaLinha(element);
+			tabela.appendChild(linha);
+	    ));
+	}
+
     </script>
 </head>
 <body>
@@ -216,8 +282,16 @@
     <!-- Nome e estado -->
     <h3 id="nomedep"></h3>
     <h4 id="part-est"></h4>
+    <br><br>
 
     <h2>Seleção de partidos para mostrar os membros</h2>
+    <br>
     <select id="menuparts" onchange="menuOpcaoEscolhidaPartido()"></select><br/>
+    <br>
+
+    <!-- Sigla do Partido -->
+    <h3 id="nomepart"></h3>
+    <br>
+    <table id="tabela"></table>
 
 </body>
