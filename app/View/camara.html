@@ -258,14 +258,15 @@
 	}
 
 	function deputadosPorPartido(idPart) {
-	    var url = montaUrl(idPart);
-	    var dados = fazGet(url);
-	    var deputados = JSON.parse(dados);
-	    var tabela = document.getElementById("tabela");
-	    deputados.forEach(element => {
-			var linha = criaLinha(element);
-			tabela.appendChild(linha);
-	    ));
+		    console.log(idPart);
+		    var url = montaUrl(idPart);
+		    var dados = fazGet(url);
+		    var deputados = JSON.parse(dados);
+		    var tabela = document.getElementById("tabela");
+		    deputados.forEach(element => {
+				var linha = criaLinha(element);
+				tabela.appendChild(linha);
+			    });
 	}
 
     </script>
