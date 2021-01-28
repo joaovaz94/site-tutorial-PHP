@@ -1,7 +1,30 @@
 <?php
 
+    /**
+    * Controller do modelo MVC Para controlar as funcionalidades
+    * na página admin da aplicação  
+    *
+    * @author João Paulo Vaz <joaovaz94.4@gmail.com>
+    */
     class AdminController {
 
+	/**
+    	 * Renderiza a página /admin
+    	 *
+	 * Carrega a página a partir do template html do site
+	 * e usa Twig para capturar variáveis e transmitie na html
+    	 *
+    	 * @param string  $originFile The original filename
+    	 * @param boolean $override   Whether to override an existing file or not
+    	 *
+    	 * @param string  $loader Registro para o Twig de onde agir no html
+    	 * @param string  $twigRegistro de local do Twig para que ele execute no controller
+    	 * @param string  $template Registro do HTML com o template e a view admin
+    	 * @param Postagem  $objPostagens Iteração do objeto Postagem para mostrar todas as postagens
+    	 * @param array  $parametros Registro dos parâmetros de cada postagem para passar pras funções
+    	 * @param string  $conteudo Registro da HTML com o template usando os parâmetros recebidos
+	 *
+    	 */
 	public function index() {
 	    
 		//renderizando a vizualisação de página a partir do Twig

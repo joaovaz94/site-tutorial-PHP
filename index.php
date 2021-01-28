@@ -1,5 +1,20 @@
 <?php
 
+    /**
+
+     * Arquivo de índice da aplicação com as principais chamadas de classe e carregamento de templates
+
+     *
+
+     * @author     João Paulo Vaz Mendes <joaovaz94.4@gmail.com>
+
+     * @copyright  João Paulo Vaz Mendes <joaovaz94.4@gmail.com>, All rights reserved.
+
+     * @link       http://phpDox.de
+
+     */
+
+
 //Inserção das classes no site a partir da página index.php
 require_once 'app/Core/Core.php';
 

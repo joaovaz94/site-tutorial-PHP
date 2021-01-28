@@ -5,6 +5,7 @@
         "use strict";
         var listaDeps = new Array();
         var listaParts = new Array();
+	var listaPartDeps = new Array();
 
         /* buscarListaDeps
             Carrega 'listaDeps' com os dados obtidos do recurso paginado,
@@ -104,6 +105,62 @@
             req.setRequestHeader ("Accept", "application/json");
             req.send();
         }
+        
+	/* buscarListaPartDeps
+            Carrega 'listaDeps' com os dados obtidos do recurso paginado,
+            em chamadas sucessivas
+        */
+        function buscarListaPartDeps (urlInicio) {
+            var corpoResposta;
+            var req = new XMLHttpRequest();
+            var dados;
+
+            req.open ("GET", urlInicio);
+            req.onreadystatechange = function (evt) {
+               if (req.readyState === req.DONE &&
+                    req.status >= 200 && req.status < 300) {
+                    // A requisição foi respondida com sucesso.
+                    corpoResposta = JSON.parse(req.responseText);
+
+                    listaPartDeps = listaPartDeps.concat(corpoResposta.dados);
+
+                    // Se houver um link de rel="next" na resposta, chamar a função de busca
+                    // outra vez usando esse link
+                    // VERSÃO COM LOOP FOR
+                    for (var i = 0; i < corpoResposta.links.length; i++) {
+
+                        if (corpoResposta.links[i].rel === "next") {
+                            buscarListaPartDeps(corpoResposta.links[i].href);
+                            return;
+                        }
+                    }
+
+                    /* VERSÃO USANDO FOREACH
+                    corpoResposta.links.forEach (
+                        function (val, idx, arr) {
+                            if (val.rel === "next") {
+                                buscarListaPartDeps (val.href);
+                                return;
+                            }
+                        }
+                    );
+                    */
+
+		    //não sei se preciso dessa função
+                    //menuCarregarOpcoes();
+
+                } // FIM DO "IF"
+            } // FIM DE onreadystatechange
+            req.setRequestHeader ("Accept", "application/json");
+            req.send();
+        }
+
+        buscarListaDeps("https://dadosabertos.camara.leg.br/api/v2/deputados?itens=100");
+        //buscarListaDeps("https://dadosabertos.camara.leg.br/api/v2/proposicoes");
+
+        /* buscarListaParts
+            Carrega 'listaParts' com os dados obtidos do recurso paginado,
+            em chamadas sucessivas
 
         buscarListaParts("https://dadosabertos.camara.leg.br/api/v2/partidos");
 
@@ -180,7 +237,7 @@
             for (var i = 0; i < listaParts.length; i++) {
                 if (listaParts[i].nome === escolhido) {
                      mostrarPartido (listaParts[i]);
-		     //deputadosPorPartido(listaParts[i].id);
+		     deputadosPorPartido(listaParts[i].id);
                 }
             }
         }
@@ -204,24 +261,6 @@
             wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
         }
 
-        /*
-        mostrarPartido - recebe um item da lista de deputados,
-          contendo os dados de um parlamentar, e os insere na
-          exibição do HTML no navegador
-        */
-        function mostrarPartido (part) {
-            //var wdgFoto = document.getElementById("fotodep");
-            var wdgNome = document.getElementById("nomepart");
-            //var wdgPartEst = document.getElementById("part-est");
-
-            // A URL da foto é colocada como valor do atributo "src"
-            //    do elemento <img> identificado com o id "fotodep"
-            //wdgFoto.setAttribute("src", dep.urlFoto);
-
-            // O nome é inserido como conteúdo do elemento com id "nome"
-            wdgNome.innerHTML = part.sigla;
-            //wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
-        }
 
 	/* 
 	    Código para retornar Parlamentares de partido escolhido
@@ -229,7 +268,7 @@
 
 	function montaUrl(idPart) {
 	    var idPart = idPart;
-	    var prefix = "https://dadosabertos.camara.leg.br/api/v2/partidosi/";
+	    var prefix = "https://dadosabertos.camara.leg.br/api/v2/partidos/";
 	    var comp = "/membros";
 
 	    var url = prefix.concat(idPart,comp);
@@ -260,14 +299,53 @@
 	function deputadosPorPartido(idPart) {
 		    console.log(idPart);
 		    var url = montaUrl(idPart);
-		    var dados = fazGet(url);
+		    //var dados = fazGet(url);
+		    var dados = buscarListaPartDeps(url);
 		    var deputados = JSON.parse(dados);
+
+		    /*
+		    var recieve = JSON.stringify(deputados);
+		    var imprime = document.getElementById("imprime").innerHTML;
+		    alert(recieve);
+		    */
+
 		    var tabela = document.getElementById("tabela");
+		    //alert(deputados);
+		    /*
 		    deputados.forEach(element => {
 				var linha = criaLinha(element);
 				tabela.appendChild(linha);
 			    });
+		    */
+
+		    for (var i = 0; i < deputados.length; i++) {
+			var linha = criaLinha(deputados[i]);
+			tabela.appendChild(linha);
+		    }
 	}
+
+	//deputadosPorPartido(36844);
+
+        /*
+        mostrarPartido - recebe um item da lista de deputados,
+          contendo os dados de um parlamentar, e os insere na
+          exibição do HTML no navegador
+        */
+        function mostrarPartido (part) {
+            //var wdgFoto = document.getElementById("fotodep");
+            var wdgNome = document.getElementById("nomepart");
+            //var wdgPartEst = document.getElementById("part-est");
+
+            // A URL da foto é colocada como valor do atributo "src"
+            //    do elemento <img> identificado com o id "fotodep"
+            //wdgFoto.setAttribute("src", dep.urlFoto);
+
+            // O nome é inserido como conteúdo do elemento com id "nome"
+            wdgNome.innerHTML = part.sigla;
+            //wdgPartEst.innerHTML = dep.siglaPartido + "-" + dep.siglaUf;
+
+	    deputadosPorPartido(part.id);
+        }
 
     </script>
 </head>
@@ -294,5 +372,6 @@
     <h3 id="nomepart"></h3>
     <br>
     <table id="tabela"></table>
+    <p id=imprime"></p>
 
 </body>
